@@ -46,6 +46,20 @@ const TextEditor = () => {
     }
   },[socket,quill])
 
+  // recieving changes 
+  useEffect(() => {
+    if(socket == null || quill == null) return
+    
+    const handler = (delta) => {
+      quill.updateContents(delta)
+    }
+    socket.on('recieve-changes', handler)
+    
+    return () => {
+      socket.off('recieve-changes', handler)
+    }
+  },[socket,quill])
+
 
    const wrapperRef = useCallback(wrapper => {
     if (wrapper == null) return

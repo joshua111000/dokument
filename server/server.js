@@ -6,5 +6,9 @@ const io = require('socket.io')(3001,{
 })
 
 io.on('connection', socket => {
-    console.log('Connected')
+    socket.on('send-changes', delta => {
+        // broad cast a message to everyone except us that changes have been made
+       socket.broadcast.emit('recieve-changes', delta)
+    })
+    
 })
