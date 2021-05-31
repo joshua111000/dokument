@@ -2,6 +2,19 @@ import { useCallback } from 'react'
 import Quill from 'quill'
 import 'quill/dist/quill.snow.css'
 
+const TOOLBAR_OPTIONS = [
+    [{ header: [1, 2, 3, 4, 5, 6, false] }],
+    [{ font: [] }],
+    [{ list: "ordered" }, { list: "bullet" }],
+    ["bold", "italic", "underline","strike"],
+    [{ color: [] }, { background: [] }],
+    [{ script: "sub" }, { script: "super" }],
+    [{ "indent": "-1"}, { "indent": "+1" }], 
+    [{ align: [] }],
+    ["image", "blockquote", "code-block"],
+    ["clean"],
+  ]
+
 const TextEditor = () => {
 
    const wrapperRef = useCallback(wrapper => {
@@ -11,7 +24,10 @@ const TextEditor = () => {
     const editor = document.createElement('div')
     wrapper.append(editor)
     new Quill(editor, {
-      theme: 'snow'
+      theme: 'snow',
+      modules: {
+          toolbar: TOOLBAR_OPTIONS
+      }
     })
   }, [])
 
