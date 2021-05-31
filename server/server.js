@@ -6,5 +6,14 @@ const io = require('socket.io')(3001,{
 })
 
 io.on('connection', socket => {
-    console.log('Connected')
+    socket.on('get-document', documentId => {
+        const data = ''
+        socket.join(documentId)
+        socket.emit('load-document', data)
+    
+    socket.on('send-changes', delta => {
+        // broad cast a message to everyone except us that changes have been made
+       socket.broadcast.to(documentId).emit('recieve-changes', delta)
+        })
+    })
 })

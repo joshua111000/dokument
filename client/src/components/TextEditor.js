@@ -2,6 +2,8 @@ import { useCallback, useEffect, useState} from 'react'
 import Quill from 'quill'
 import 'quill/dist/quill.snow.css'
 import {io} from 'socket.io-client'
+import {useParams} from 'react-router-dom'
+
 
 const TOOLBAR_OPTIONS = [
     [{ header: [1, 2, 3, 4, 5, 6, false] }],
@@ -17,6 +19,8 @@ const TOOLBAR_OPTIONS = [
   ]
 
 const TextEditor = () => {
+  const {id: documentId} = useParams() // params contains the id object
+
   const [socket, setSocket] = useState()
   const [quill, setQuill] = useState()
 
@@ -30,6 +34,18 @@ const TextEditor = () => {
       soc.disconnect()
     }
   }, [])
+
+  useEffect(() => {
+    if(socket == null || quill == null) return
+
+    socket.once('load-document', document => {
+      quill.setContents(document)
+      quill.enable()
+    })
+
+    socket.emit('get-document', documentId)
+
+  }, [socket,quill,documentId])
 
   // making changes when quill changes 
   useEffect(() => {
@@ -46,6 +62,20 @@ const TextEditor = () => {
     }
   },[socket,quill])
 
+  // recieving changes 
+  useEffect(() => {
+    if(socket == null || quill == null) return
+    
+    const handler = (delta) => {
+      quill.updateContents(delta)
+    }
+    socket.on('recieve-changes', handler)
+    
+    return () => {
+      socket.off('recieve-changes', handler)
+    }
+  },[socket,quill])
+
 
    const wrapperRef = useCallback(wrapper => {
     if (wrapper == null) return
@@ -59,7 +89,10 @@ const TextEditor = () => {
           toolbar: TOOLBAR_OPTIONS
       }
     })
+    q.disable()
+    q.setText('Loading...')
     setQuill(q)
+
   }, [])
 
     return (
