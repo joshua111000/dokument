@@ -18,7 +18,7 @@ const io = require('socket.io')(3001,{
 const defaultValue = ''
 
 io.on('connection', socket => {
-    socket.on('get-document', documentId => {
+    socket.on('get-document', async documentId => {
         const document = findOrCreateDocument(documentId)
         socket.join(documentId)
         socket.emit('load-document', document.data)
@@ -27,6 +27,9 @@ io.on('connection', socket => {
         // broad cast a message to everyone except us that changes have been made
        socket.broadcast.to(documentId).emit('recieve-changes', delta)
         })
+    socket.on('save-document', async data => {
+        await Document.findByIdAndUpdate(documentId, {data})
+    })
     })
 })
 
