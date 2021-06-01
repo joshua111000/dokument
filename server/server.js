@@ -1,4 +1,5 @@
 const mongoose = require('mongoose')
+const Document = require('./Document')
 
 mongoose.connect("mongodb://localhost/dokument", {
   useNewUrlParser: true,
